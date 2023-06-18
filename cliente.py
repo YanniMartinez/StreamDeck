@@ -3,7 +3,7 @@ import socket
 
 class ClienteSocketApp:
     def __init__(self):
-        self.palabras = ["VisualStudio", "PowerPoint", "Excel", "Word"]
+        self.palabras = ["visualstudio", "powerpoint", "excel", "word"]
         self.rutas_imagenes = [
             "visualstudio.png",
             "powerpoint.png",
