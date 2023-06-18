@@ -11,5 +11,5 @@ while True:
     print (addr)
     peticion = conexion.recv(1024)
     print (peticion)
-    conexion.send("Hola, te saludo desde el servidor!")
+    conexion.send("Hola, te saludo desde el servidor!".encode("utf-8"))
     conexion.close()
