@@ -2,6 +2,8 @@ import socket
 import subprocess
 import webbrowser
 import time
+import tkinter as tk
+import pickle  # Módulo para serialización
 
 class ServidorSocket:
     def __init__(self):
@@ -29,7 +31,10 @@ class ServidorSocket:
             # Aquí puedes agregar la lógica que desees según la palabra recibida
             self.accion_stream(palabra)
             # Ejemplo: enviar una respuesta al cliente
-            respuesta = "Respuesta a la palabra " + palabra
+            if(palabra != "config"):
+                respuesta = "Respuesta a la palabra " + palabra
+            else:
+                pass
             self.cliente_socket.send(respuesta.encode())
 
         self.cerrar_conexion()
@@ -40,7 +45,20 @@ class ServidorSocket:
         print("Conexiones cerradas. Servidor detenido.")
 
     def accion_stream(self, accion):
-        if(accion == "visualstudio"):
+        if(accion=="config"):
+            try:
+                app = InterfazGrafica()
+                print("El arreglo nuevo de config es:")
+                arreglo = app.get_array()
+                print("Valor del objeto")
+                print(arreglo)
+                self.enviar_arreglo(arreglo)
+
+            except Exception as e:
+                # Manejo de la excepción
+                print("Config se cerró inesperadamente:", str(e))
+
+        elif(accion == "visualstudio"):
             # Comando para abrir Visual Studio Code
             comando = "code"
             # Ejecuta el comando
@@ -101,7 +119,67 @@ class ServidorSocket:
             subprocess.run(comando, shell=True)
         else:
             print("Opcion invalida")
-            
+    
+    def enviar_arreglo(self, arreglo):
+        print("Enviando el arreglo")
+        try:
+            arreglo_serializado = pickle.dumps(arreglo)
+            print(arreglo_serializado)
+            self.cliente_socket.send(arreglo_serializado)
+            print("arreglo enviado")
+        except Exception as e:
+            print("Error al enviar el arreglo:", str(e))
+
+class InterfazGrafica:
+    def __init__(self):
+        self.inputs = []
+        self.arreglo = []
+        self.ventana = tk.Tk()
+        self.ventana.title("Interfaz con Tkinter")
+        self.ventana.geometry("400x200")
+
+        self.crear_interfaz()
+
+        self.ventana.mainloop()
+
+    def crear_interfaz(self):
+        for i in range(4):
+            label = tk.Label(self.ventana, text=f"Input {i+1}:")
+            label.pack()
+
+            entry = tk.Entry(self.ventana)
+            entry.pack(pady=5)
+
+            self.inputs.append(entry)
+
+        boton = tk.Button(self.ventana, text="Verificar", command=self.verificar_inputs)
+        boton.pack(pady=10)
+
+    def verificar_inputs(self):
+        valores = [entry.get() for entry in self.inputs]
+
+        if len(set(valores)) != len(valores):
+            tk.messagebox.showerror("Error", "Los valores no pueden ser nulos o iguales.")
+            return
+
+        if len(valores) == 4:
+            self.cerrar_ventana()
+            self.guardar_arreglo(valores)
+        else:
+            tk.messagebox.showerror("Error", "Debe ingresar valores en todos los inputs.")
+
+    def guardar_arreglo(self, valores):
+        print("Dentro guardar_arreglo")
+        self.arreglo = valores  # Aquí puedes realizar cualquier procesamiento adicional con los valores ingresados
+        print(self.arreglo)  # Muestra el arreglo en la consola
+
+
+    def cerrar_ventana(self):
+        self.ventana.destroy()
+
+    def get_array(self):
+        return self.arreglo
+
 
 if __name__ == "__main__":
     servidor = ServidorSocket()
