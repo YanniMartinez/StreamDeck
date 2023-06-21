@@ -24,6 +24,8 @@ class ClienteSocketApp:
         self.ventana.mainloop()
 
     def crear_interfaz(self):
+
+        self.limpiar_ventana()
         for i in range(len(self.palabras)):
             palabra = self.palabras[i]
             ruta_imagen = self.rutas_imagenes[i]
@@ -68,9 +70,16 @@ class ClienteSocketApp:
                 self.actualizar_palabras(arreglo)
 
     def actualizar_palabras(self, nuevas_palabras):
-        for i, palabra in enumerate(nuevas_palabras):
+        #for i, palabra in enumerate(nuevas_palabras):
             #print(palabra)
-            self.botones[i]["text"] = palabra
+        #    self.botones[i]["text"] = palabra
+        self.palabras = nuevas_palabras
+        #self.botones = []
+        self.crear_interfaz()
+    
+    def limpiar_ventana(self):
+        for widget in self.ventana.winfo_children():
+            widget.destroy()
 
     def __del__(self):
         self.mi_socket.close()

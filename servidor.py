@@ -3,6 +3,7 @@ import subprocess
 import tkinter as tk
 import pickle  # Módulo para serialización
 from tkinter import OptionMenu
+import webbrowser
 
 class ServidorSocket:
     def __init__(self):
@@ -25,16 +26,17 @@ class ServidorSocket:
                 break
 
             palabra = datos.decode()
-            #print("Palabra recibida:", palabra)
-
+            print("Palabra recibida:", palabra)
+            
             if palabra == "config":
                 arreglo = self.obtener_arreglo()
                 print(arreglo)
                 self.cliente_socket.send(arreglo.encode())
                 print("Se envió el valor de nuevas configuraciones al cliente")
             else:
-                respuesta = "Respuesta a la palabra " + palabra
-                self.cliente_socket.send(respuesta.encode())
+                self.accion_stream(palabra)
+                #respuesta = "Respuesta a la palabra " + palabra
+                #self.cliente_socket.send(respuesta.encode())
 
         self.cerrar_conexion()
 
@@ -47,6 +49,75 @@ class ServidorSocket:
         app = InterfazGrafica()
         arreglo = app.get_array()
         return arreglo
+    
+    def accion_stream(self, accion):
+        if(accion == "visualstudio"):
+            # Comando para abrir Visual Studio Code
+            comando = "code"
+            # Ejecuta el comando
+            subprocess.run(comando, shell=True)
+        elif(accion == "notepad"):
+            # Comando para abrir el Bloc de notas con el archivo de script
+            comando = "notepad.exe"
+
+            # Ejecuta el comando
+            subprocess.run(comando, shell=True)
+        elif(accion == "powerpoint"):
+            # Comando para abrir Microsoft PowerPoint
+            comando = "start powerpnt"
+
+            # Ejecuta el comando
+            subprocess.run(comando, shell=True)
+        elif(accion == "word"):
+            # Comando para abrir Microsoft Word
+            comando = "start winword"
+
+            # Ejecuta el comando
+            subprocess.run(comando, shell=True)
+        elif(accion == "excel"):
+            # Comando para abrir Microsoft Excel
+            comando = "start excel"
+
+            # Ejecuta el comando
+            subprocess.run(comando, shell=True)
+        elif(accion == "steam"):
+            # Ruta al ejecutable de Steam
+            ruta_steam = "C:\Program Files (x86)\Steam\steam.exe"
+
+            # Comando para abrir Steam Launcher
+            comando = f'"{ruta_steam}"'
+
+            # Ejecuta el comando
+            subprocess.run(comando, shell=True)
+        elif(accion == "epic"):
+            # Ruta al ejecutable de Epic Games Launcher
+            ruta_epicgames = "C:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win32\EpicGamesLauncher.exe"
+
+            # Comando para abrir Epic Games Launcher
+            comando = f'"{ruta_epicgames}"'
+
+            # Ejecuta el comando
+            subprocess.run(comando, shell=True)
+        elif(accion == "apagar"):
+            # Comando para apagar el equipo definitivamente
+            comando = "shutdown /s"
+
+            # Ejecuta el comando
+            subprocess.run(comando, shell=True)
+        elif(accion == "suspender"):
+            # Comando para suspender el equipo
+            comando = "shutdown /h"
+
+            # Ejecuta el comando
+            subprocess.run(comando, shell=True)
+        elif(accion == "navegador"):
+            # URL que se abrirá en el navegador predeterminado
+            url = "https://www.google.com"
+
+            # Abrir la URL en el navegador predeterminado
+            webbrowser.open(url)
+        else:
+            print("Opcion invalida")
 
 
 
@@ -64,7 +135,7 @@ class InterfazGrafica:
         self.ventana.mainloop()
 
     def crear_interfaz(self):
-        opciones = ['word', 'visualstudio', 'excel', 'powerpoint', 'steam', 'epic', 'notepad', 'suspende', 'apagar', 'navegador']  # Cambia las opciones según tus necesidades
+        opciones = ['word', 'visualstudio', 'excel', 'powerpoint', 'steam', 'epic', 'notepad', 'suspender', 'apagar', 'navegador']  # Cambia las opciones según tus necesidades
 
         for i in range(4):
             label = tk.Label(self.ventana, text=f"Input {i+1}:")
