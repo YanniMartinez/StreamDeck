@@ -28,13 +28,11 @@ class ClienteSocketApp:
         self.limpiar_ventana()
         for i in range(len(self.palabras)):
             palabra = self.palabras[i]
-            ruta_imagen = self.rutas_imagenes[i]
-
-            #imagen = tk.PhotoImage(file=ruta_imagen)
-            #imagen = imagen.subsample(50, 50)
-            boton = tk.Button(self.ventana, text=palabra,  compound=tk.TOP,
-                              command=lambda p=palabra: self.boton_presionado(p))
-            #boton.image = imagen
+            imagen = tk.PhotoImage(file=palabra+".png")
+            imagen = imagen.subsample(30, 30)
+            boton = tk.Button(self.ventana, text=palabra, image=imagen,  compound=tk.TOP,
+                              command=lambda p=palabra: self.boton_presionado(p), width=100, height=100)
+            boton.image = imagen
             boton.pack(pady=10)
             self.botones.append(boton)
         
@@ -42,7 +40,7 @@ class ClienteSocketApp:
         imagen = tk.PhotoImage(file="config.png")
         imagen = imagen.subsample(100, 100)
         boton = tk.Button(self.ventana, text=palabra, image=imagen, compound=tk.TOP,
-                            command=lambda p=palabra: self.boton_presionado(palabra))
+                            command=lambda p=palabra: self.boton_presionado(palabra),width=100, height=100)
         boton.image = imagen
         boton.pack(pady=10)
 
