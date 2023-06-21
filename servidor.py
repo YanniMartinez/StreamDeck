@@ -1,7 +1,5 @@
 import socket
 import subprocess
-import webbrowser
-import time
 import tkinter as tk
 import pickle  # Módulo para serialización
 
@@ -26,16 +24,16 @@ class ServidorSocket:
                 break
 
             palabra = datos.decode()
-            print("Palabra recibida:", palabra)
+            #print("Palabra recibida:", palabra)
 
-            # Aquí puedes agregar la lógica que desees según la palabra recibida
-            self.accion_stream(palabra)
-            # Ejemplo: enviar una respuesta al cliente
-            if(palabra != "config"):
-                respuesta = "Respuesta a la palabra " + palabra
+            if palabra == "config":
+                arreglo = self.obtener_arreglo()
+                print(arreglo)
+                self.cliente_socket.send(arreglo.encode())
+                print("Se envió el valor de nuevas configuraciones al cliente")
             else:
-                pass
-            self.cliente_socket.send(respuesta.encode())
+                respuesta = "Respuesta a la palabra " + palabra
+                self.cliente_socket.send(respuesta.encode())
 
         self.cerrar_conexion()
 
@@ -44,99 +42,20 @@ class ServidorSocket:
         self.mi_socket.close()
         print("Conexiones cerradas. Servidor detenido.")
 
-    def accion_stream(self, accion):
-        if(accion=="config"):
-            try:
-                app = InterfazGrafica()
-                print("El arreglo nuevo de config es:")
-                arreglo = app.get_array()
-                print("Valor del objeto")
-                print(arreglo)
-                self.enviar_arreglo(arreglo)
+    def obtener_arreglo(self):
+        app = InterfazGrafica()
+        arreglo = app.get_array()
+        return arreglo
 
-            except Exception as e:
-                # Manejo de la excepción
-                print("Config se cerró inesperadamente:", str(e))
-
-        elif(accion == "visualstudio"):
-            # Comando para abrir Visual Studio Code
-            comando = "code"
-            # Ejecuta el comando
-            subprocess.run(comando, shell=True)
-        elif(accion == "notepad"):
-            # Comando para abrir el Bloc de notas con el archivo de script
-            comando = "notepad.exe"
-
-            # Ejecuta el comando
-            subprocess.run(comando, shell=True)
-        elif(accion == "powerpoint"):
-            # Comando para abrir Microsoft PowerPoint
-            comando = "start powerpnt"
-
-            # Ejecuta el comando
-            subprocess.run(comando, shell=True)
-        elif(accion == "word"):
-            # Comando para abrir Microsoft Word
-            comando = "start winword"
-
-            # Ejecuta el comando
-            subprocess.run(comando, shell=True)
-        elif(accion == "excel"):
-            # Comando para abrir Microsoft Excel
-            comando = "start excel"
-
-            # Ejecuta el comando
-            subprocess.run(comando, shell=True)
-        elif(accion == "steam"):
-            # Ruta al ejecutable de Steam
-            ruta_steam = "C:\Program Files (x86)\Steam\steam.exe"
-
-            # Comando para abrir Steam Launcher
-            comando = f'"{ruta_steam}"'
-
-            # Ejecuta el comando
-            subprocess.run(comando, shell=True)
-        elif(accion == "epic"):
-            # Ruta al ejecutable de Epic Games Launcher
-            ruta_epicgames = "C:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win32\EpicGamesLauncher.exe"
-
-            # Comando para abrir Epic Games Launcher
-            comando = f'"{ruta_epicgames}"'
-
-            # Ejecuta el comando
-            subprocess.run(comando, shell=True)
-        elif(accion == "apagar"):
-            # Comando para apagar el equipo definitivamente
-            comando = "shutdown /s"
-
-            # Ejecuta el comando
-            subprocess.run(comando, shell=True)
-        elif(accion == "suspender"):
-            # Comando para suspender el equipo
-            comando = "shutdown /h"
-
-            # Ejecuta el comando
-            subprocess.run(comando, shell=True)
-        else:
-            print("Opcion invalida")
-    
-    def enviar_arreglo(self, arreglo):
-        print("Enviando el arreglo")
-        try:
-            arreglo_serializado = pickle.dumps(arreglo)
-            print(arreglo_serializado)
-            self.cliente_socket.send(arreglo_serializado)
-            print("arreglo enviado")
-        except Exception as e:
-            print("Error al enviar el arreglo:", str(e))
 
 class InterfazGrafica:
     def __init__(self):
         self.inputs = []
         self.arreglo = []
+        self.palabras = ""
         self.ventana = tk.Tk()
         self.ventana.title("Interfaz con Tkinter")
-        self.ventana.geometry("400x200")
+        self.ventana.geometry("600x400")
 
         self.crear_interfaz()
 
@@ -165,20 +84,22 @@ class InterfazGrafica:
         if len(valores) == 4:
             self.cerrar_ventana()
             self.guardar_arreglo(valores)
+            print(self.palabras)
         else:
             tk.messagebox.showerror("Error", "Debe ingresar valores en todos los inputs.")
 
     def guardar_arreglo(self, valores):
-        print("Dentro guardar_arreglo")
-        self.arreglo = valores  # Aquí puedes realizar cualquier procesamiento adicional con los valores ingresados
-        print(self.arreglo)  # Muestra el arreglo en la consola
+        self.arreglo = valores
+        for valor in valores:
+            self.palabras += ","+valor
+        self.palabras = self.palabras[1:]
 
 
     def cerrar_ventana(self):
         self.ventana.destroy()
 
     def get_array(self):
-        return self.arreglo
+        return self.palabras
 
 
 if __name__ == "__main__":
