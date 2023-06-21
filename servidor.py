@@ -2,6 +2,7 @@ import socket
 import subprocess
 import tkinter as tk
 import pickle  # Módulo para serialización
+from tkinter import OptionMenu
 
 class ServidorSocket:
     def __init__(self):
@@ -48,6 +49,7 @@ class ServidorSocket:
         return arreglo
 
 
+
 class InterfazGrafica:
     def __init__(self):
         self.inputs = []
@@ -62,20 +64,24 @@ class InterfazGrafica:
         self.ventana.mainloop()
 
     def crear_interfaz(self):
+        opciones = ['word', 'visualstudio', 'excel', 'powerpoint', 'steam', 'epic', 'notepad', 'suspende', 'apagar', 'navegador']  # Cambia las opciones según tus necesidades
+
         for i in range(4):
             label = tk.Label(self.ventana, text=f"Input {i+1}:")
             label.pack()
 
-            entry = tk.Entry(self.ventana)
-            entry.pack(pady=5)
+            opcion_var = tk.StringVar(self.ventana)
+            opcion_var.set(opciones[0])  # Establece el valor inicial
+            opcion_menu = OptionMenu(self.ventana, opcion_var, *opciones)
+            opcion_menu.pack(pady=5)
 
-            self.inputs.append(entry)
+            self.inputs.append(opcion_var)
 
         boton = tk.Button(self.ventana, text="Verificar", command=self.verificar_inputs)
         boton.pack(pady=10)
 
     def verificar_inputs(self):
-        valores = [entry.get() for entry in self.inputs]
+        valores = [opcion.get() for opcion in self.inputs]
 
         if len(set(valores)) != len(valores):
             tk.messagebox.showerror("Error", "Los valores no pueden ser nulos o iguales.")
@@ -93,7 +99,6 @@ class InterfazGrafica:
         for valor in valores:
             self.palabras += ","+valor
         self.palabras = self.palabras[1:]
-
 
     def cerrar_ventana(self):
         self.ventana.destroy()
